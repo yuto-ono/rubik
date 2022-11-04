@@ -1,4 +1,5 @@
 import App from "./App.svelte"
+import "./globals.scss"
 
 const el = document.getElementById("app")
 
