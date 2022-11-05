@@ -1,15 +1,16 @@
 <script lang="ts">
+  let selectedSize = 3
+  const sizeOptions = [2, 3, 4, 5, 6, 7]
+
+  $: console.log(selectedSize)
 </script>
 
 <div class="size">
   <label class="label" for="cube_select">キューブのサイズ</label>
-  <select class="select" id="cube_select">
-    <option>2x2x2</option>
-    <option>3x3x3</option>
-    <option>4x4x4</option>
-    <option>5x5x5</option>
-    <option>6x6x6</option>
-    <option>7x7x7</option>
+  <select class="select" id="cube_select" bind:value={selectedSize}>
+    {#each sizeOptions as size}
+      <option value={size}>{size}x{size}x{size}</option>
+    {/each}
   </select>
 </div>
 
@@ -18,7 +19,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 10px;
+    margin-top: 20px;
   }
   .label {
     margin-right: 10px;
