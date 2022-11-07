@@ -23,7 +23,6 @@ const rowGetterList: Record<Axis, RowGetter> = {
  * キューブ全体
  */
 export class WholeCube {
-  // matrix: Matrix
   col: number
   private cubes: Cube[] = []
   private sortedCubes: Cube[] = []
@@ -33,7 +32,6 @@ export class WholeCube {
 
   constructor(col: number) {
     const sideLength = (CUBE_SIZE / col) >> 1
-    // this.matrix = new Matrix()
     this.col = col
     this.matrix = new Matrix()
     this.cubes = []
