@@ -1,5 +1,11 @@
 <script lang="ts">
   import Button from "./Button.svelte"
+  import { cubeManager } from "./stores"
+
+  const reset = () => {
+    $cubeManager.reset()
+    $cubeManager.draw()
+  }
 </script>
 
 <div class="btn-list">
@@ -7,7 +13,7 @@
     <Button>シャッフル</Button>
   </div>
   <div class="btn-item">
-    <Button>リセット</Button>
+    <Button on:click={reset}>リセット</Button>
   </div>
 </div>
 

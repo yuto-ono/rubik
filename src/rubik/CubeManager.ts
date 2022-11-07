@@ -77,4 +77,11 @@ export class CubeManager {
   revert(): void {
     this.wholeCube.revert()
   }
+
+  /**
+   * リセット
+   */
+  reset(): void {
+    this.wholeCube.reset()
+  }
 }

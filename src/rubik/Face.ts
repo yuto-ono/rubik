@@ -7,7 +7,7 @@ import {
   unitVector,
 } from "./functions"
 import type { Renderer } from "./Renderer"
-import type { Axis, AxisAndDirection, Point, Vector } from "./types"
+import type { AxisAndDirection, Point, Vector } from "./types"
 import type { Vertex } from "./Vertex"
 
 /**
@@ -15,6 +15,7 @@ import type { Vertex } from "./Vertex"
  */
 export class Face {
   visible = false
+  private color = 6
 
   constructor(
     private v1: Vertex,
@@ -23,6 +24,13 @@ export class Face {
     private v4: Vertex,
     private v5: Vertex
   ) {}
+
+  /**
+   * 色を設定
+   */
+  setColor(color: number): void {
+    this.color = color
+  }
 
   /**
    * 面が見えるかどうかを計算する
@@ -35,13 +43,13 @@ export class Face {
   /**
    * 面を描画
    */
-  draw(renderer: Renderer, color: number): void {
+  draw(renderer: Renderer): void {
     renderer.fillQuadrangle(
       this.v1.screenPoint,
       this.v2.screenPoint,
       this.v3.screenPoint,
       this.v4.screenPoint,
-      color
+      this.color
     )
   }
 

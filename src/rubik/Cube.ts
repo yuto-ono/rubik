@@ -8,15 +8,10 @@ import { Vertex } from "./Vertex"
  * 各キューブ
  */
 export class Cube {
-  private center: Point3D
-  private sideLength: number
   private vertexes: Vertex[]
   private faces: Face[]
 
   constructor(center: Point3D, sideLength: number) {
-    this.center = center
-    this.sideLength = sideLength
-
     const [c, l] = [center, sideLength]
     const v: Vertex[] = [
       new Vertex({ x: c.x + l, y: c.y + l, z: c.z + l }),
@@ -54,9 +49,9 @@ export class Cube {
    * キューブを描画
    */
   draw(renderer: Renderer): void {
-    this.faces.forEach((face, i) => {
+    this.faces.forEach((face) => {
       if (face.visible) {
-        face.draw(renderer, i)
+        face.draw(renderer)
       }
     })
   }
@@ -92,5 +87,12 @@ export class Cube {
    */
   revert(): void {
     this.vertexes.forEach((vertex) => vertex.revert())
+  }
+
+  /**
+   * 面の色を設定
+   */
+  setColor(faceIndex: number, color: number): void {
+    this.faces[faceIndex].setColor(color)
   }
 }

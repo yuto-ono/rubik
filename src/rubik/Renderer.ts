@@ -8,7 +8,7 @@ const colors = [
   "#00c", // blue
   "#fff", //white
   "#000", //black
-]
+] as const
 
 /**
  * 描画するクラス

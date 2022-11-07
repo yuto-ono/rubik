@@ -2,6 +2,7 @@ import { CUBE_SIZE, DRAG_LIMIT } from "./constants"
 import { Cube } from "./Cube"
 import { Matrix } from "./Matrix"
 import type { Renderer } from "./Renderer"
+import { Sticker } from "./Sticker"
 import type { Axis, Point, TouchDetail, TransferParams, Vector } from "./types"
 
 type IndexGetter = (col: number, x: number, y: number, z: number) => number
@@ -29,12 +30,14 @@ export class WholeCube {
   private axis: Axis = "z"
   private matrix: Matrix
   private touchDetail: TouchDetail | undefined
+  private stiker: Sticker
 
   constructor(col: number) {
     const sideLength = (CUBE_SIZE / col) >> 1
     this.col = col
     this.matrix = new Matrix()
     this.cubes = []
+    this.stiker = new Sticker(col)
 
     for (let i = 0; i < col; i++) {
       for (let j = 0; j < col; j++) {
@@ -52,6 +55,8 @@ export class WholeCube {
         }
       }
     }
+
+    this.coloring()
   }
 
   /**
@@ -112,6 +117,20 @@ export class WholeCube {
    */
   revert(): void {
     this.cubes.forEach((cube) => cube.revert())
+    if (this.touchDetail != null) {
+      const { row, direction } = this.touchDetail
+      this.stiker.rotate(this.axis, row, direction)
+      this.coloring()
+    }
+  }
+
+  /**
+   * リセット
+   */
+  reset(): void {
+    this.stiker.reset()
+    this.coloring()
+    this.matrix = new Matrix()
   }
 
   /**
@@ -250,5 +269,31 @@ export class WholeCube {
 
   private addSortedCube(x: number, y: number, z: number): void {
     this.sortedCubes.push(this.cubes[this.getIndex(x, y, z)])
+  }
+
+  /**
+   * 面に色をつける
+   */
+  private coloring(): void {
+    const max = this.col - 1
+    this.coloringFace("x", 1, max)
+    this.coloringFace("x", 3, 0)
+    this.coloringFace("y", 0, max)
+    this.coloringFace("y", 5, 0)
+    this.coloringFace("z", 4, max)
+    this.coloringFace("z", 2, 0)
+  }
+
+  private coloringFace(axis: Axis, faceIndex: number, row: number): void {
+    const colors = this.stiker.data[faceIndex]
+    this.axis = axis
+    for (let i = 0; i < this.col; i++) {
+      for (let j = 0; j < this.col; j++) {
+        this.cubes[this.getIndex(row, i, j)].setColor(
+          faceIndex,
+          colors[i + j * this.col]
+        )
+      }
+    }
   }
 }
