@@ -8,6 +8,8 @@
   let hidden = true
   let canvasWidth = 700
   let dragging = false
+  let faceTouched = false
+  let animating = false
   let touchPoint: Point
   let timerId: NodeJS.Timeout | undefined
   let dpr = window.devicePixelRatio
@@ -34,21 +36,49 @@
   const onTouchMove = (e: TouchEvent) => {
     const touch = e.touches[0]
     const rect = canvas.getBoundingClientRect()
-    drag({
-      x: (touch.clientX - rect.x) * dpr,
-      y: (touch.clientY - rect.y) * dpr,
-    })
+    if (dragging) {
+      drag({
+        x: (touch.clientX - rect.x) * dpr,
+        y: (touch.clientY - rect.y) * dpr,
+      })
+    }
   }
 
   const dragStart = (p: Point) => {
     dragging = true
     touchPoint = p
+    faceTouched = $cubeManager.touch(p)
   }
 
   const drag = (p: Point) => {
-    $cubeManager.moveAngle(createVector(touchPoint, p))
-    $cubeManager.draw()
-    touchPoint = p
+    if (faceTouched) {
+      if (!animating) {
+        const v = createVector(touchPoint, p)
+        if ($cubeManager.detectAxis(v)) {
+          animating = true
+          dragging = false
+          const startTime = performance.now()
+          const animate = () => {
+            const t = performance.now() - startTime
+            const rad = t / 200
+            if (rad < 1.57) {
+              $cubeManager.rotate(rad)
+              $cubeManager.draw()
+              requestAnimationFrame(animate)
+            } else {
+              $cubeManager.revert()
+              $cubeManager.draw()
+              animating = false
+            }
+          }
+          requestAnimationFrame(animate)
+        }
+      }
+    } else {
+      $cubeManager.moveAngle(createVector(touchPoint, p))
+      $cubeManager.draw()
+      touchPoint = p
+    }
   }
 
   onMount(() => {

@@ -1,3 +1,5 @@
+import type { Face } from "./Face"
+
 /**
  * 2D座標
  */
@@ -33,4 +35,33 @@ export type TransferParams = {
   screenSize: number
   center: number
   turnRate: number
+}
+
+/**
+ * 回転軸
+ */
+export type Axis = "x" | "y" | "z"
+
+/**
+ * タッチした面の情報
+ */
+export type TouchDetail = {
+  face: Face
+  faceIndex: number
+  cubeIndex: number
+  row: number
+  direction: boolean
+}
+
+/**
+ * タッチした面の情報
+ */
+export type TouchInfo = Pick<TouchDetail, "faceIndex" | "face">
+
+/**
+ * 回転軸と回転方向
+ */
+export type AxisAndDirection = {
+  axis: Axis
+  direction: boolean
 }

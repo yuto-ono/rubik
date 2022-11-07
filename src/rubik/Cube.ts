@@ -1,7 +1,7 @@
 import { Face } from "./Face"
 import type { Matrix } from "./Matrix"
 import type { Renderer } from "./Renderer"
-import type { Point3D, TransferParams } from "./types"
+import type { Axis, Point, Point3D, TouchInfo, TransferParams } from "./types"
 import { Vertex } from "./Vertex"
 
 /**
@@ -66,5 +66,31 @@ export class Cube {
    */
   isFaceVisible(i: number): boolean {
     return this.faces[i].visible
+  }
+
+  /**
+   * 面へのタッチを試みる タッチできたら面の情報を返す
+   */
+  touch(p: Point): TouchInfo | undefined {
+    for (let i = 0; i < this.faces.length; i++) {
+      const face = this.faces[i]
+      if (face.isInside(p)) {
+        return { face, faceIndex: i }
+      }
+    }
+  }
+
+  /**
+   * キューブを回転する
+   */
+  rotate(rad: number, axis: Axis): void {
+    this.vertexes.forEach((vertex) => vertex.rotate(rad, axis))
+  }
+
+  /**
+   * 回転をもとに戻す
+   */
+  revert(): void {
+    this.vertexes.forEach((vertex) => vertex.revert())
   }
 }

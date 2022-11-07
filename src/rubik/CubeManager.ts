@@ -1,5 +1,5 @@
 import { Renderer } from "./Renderer"
-import type { TransferParams, Vector } from "./types"
+import type { Point, TransferParams, Vector } from "./types"
 import { WholeCube } from "./WholeCube"
 
 const calcTransferParams = (screenSize: number): TransferParams => ({
@@ -26,7 +26,6 @@ export class CubeManager {
   setCol(col: number): void {
     if (col !== this.wholeCube.col) {
       this.wholeCube = new WholeCube(col)
-      console.log("setCol", col)
     }
   }
 
@@ -49,5 +48,33 @@ export class CubeManager {
    */
   moveAngle(v: Vector): void {
     this.wholeCube.moveAngle(v, this.tParams)
+  }
+
+  /**
+   * タッチを試みる
+   */
+  touch(p: Point): boolean {
+    return this.wholeCube.touch(p)
+  }
+
+  /**
+   * ベクトルをもとに回転軸を決定
+   */
+  detectAxis(v: Vector): boolean {
+    return this.wholeCube.detectAxis(v)
+  }
+
+  /**
+   * キューブを回転する
+   */
+  rotate(rad: number): void {
+    this.wholeCube.rotate(rad)
+  }
+
+  /**
+   * 回転をもとに戻す
+   */
+  revert(): void {
+    this.wholeCube.revert()
   }
 }

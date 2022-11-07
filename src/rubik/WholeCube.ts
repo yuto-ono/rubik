@@ -1,16 +1,22 @@
-import { CUBE_SIZE } from "./constants"
+import { CUBE_SIZE, DRAG_LIMIT } from "./constants"
 import { Cube } from "./Cube"
 import { Matrix } from "./Matrix"
 import type { Renderer } from "./Renderer"
-import type { TransferParams, Vector } from "./types"
+import type { Axis, Point, TouchDetail, TransferParams, Vector } from "./types"
 
-type Axis = "x" | "y" | "z"
 type IndexGetter = (col: number, x: number, y: number, z: number) => number
+type RowGetter = (col: number, i: number) => number
 
 const indexGetterList: Record<Axis, IndexGetter> = {
   x: (col, x, y, z) => x + y * col + z * col * col,
   y: (col, x, y, z) => z + x * col + y * col * col,
   z: (col, x, y, z) => y + z * col + x * col * col,
+}
+
+const rowGetterList: Record<Axis, RowGetter> = {
+  x: (col, i) => i % col,
+  y: (col, i) => Math.floor(i / col) % col,
+  z: (col, i) => Math.floor(i / (col * col)),
 }
 
 /**
@@ -21,9 +27,9 @@ export class WholeCube {
   col: number
   private cubes: Cube[] = []
   private sortedCubes: Cube[] = []
-  private reversedCubes: Cube[] = []
-  private axis: Axis = "x"
+  private axis: Axis = "z"
   private matrix: Matrix
+  private touchDetail: TouchDetail | undefined
 
   constructor(col: number) {
     const sideLength = (CUBE_SIZE / col) >> 1
@@ -66,6 +72,67 @@ export class WholeCube {
   moveAngle(v: Vector, { turnRate }: TransferParams): void {
     this.matrix.rotX(v.x * turnRate)
     this.matrix.rotY(v.y * turnRate)
+  }
+
+  /**
+   * タッチを試みる
+   * タッチできたら、タッチした面を保存して true を返す
+   */
+  touch(p: Point): boolean {
+    for (const cube of [...this.sortedCubes].reverse()) {
+      const touchInfo = cube.touch(p)
+      if (touchInfo != null) {
+        this.touchDetail = {
+          ...touchInfo,
+          cubeIndex: this.cubes.indexOf(cube),
+          row: 0,
+          direction: false,
+        }
+        return true
+      }
+    }
+    return false
+  }
+
+  /**
+   * キューブを回転する
+   */
+  rotate(rad: number): void {
+    if (this.touchDetail != null) {
+      const { direction, row } = this.touchDetail
+      const _rad = direction ? rad : -rad
+      for (let i = 0; i < this.col; i++) {
+        for (let j = 0; j < this.col; j++) {
+          this.cubes[this.getIndex(row, i, j)].rotate(_rad, this.axis)
+        }
+      }
+    }
+  }
+
+  /**
+   * 回転をもとに戻す
+   */
+  revert(): void {
+    this.cubes.forEach((cube) => cube.revert())
+  }
+
+  /**
+   * ベクトルをもとに回転軸を決定
+   */
+  detectAxis(v: Vector): boolean {
+    if (this.touchDetail == null) {
+      return false
+    }
+    if (v.x * v.x + v.y * v.y < DRAG_LIMIT) {
+      return false
+    }
+
+    const { face, faceIndex } = this.touchDetail
+    const { axis, direction } = face.detectAxis(v, faceIndex)
+    this.axis = axis
+    this.touchDetail.direction = direction
+    this.touchDetail.row = this.getRow(this.touchDetail.cubeIndex)
+    return true
   }
 
   /**
@@ -116,6 +183,13 @@ export class WholeCube {
   }
 
   /**
+   * キューブIDをもとに行番号を取得
+   */
+  private getRow(cubeIndex: number): number {
+    return rowGetterList[this.axis](this.col, cubeIndex)
+  }
+
+  /**
    * キューブを並べ替え（描画のため）
    */
   private sort(): void {
@@ -131,8 +205,6 @@ export class WholeCube {
         break
       }
     }
-
-    this.reversedCubes = [...this.sortedCubes].reverse()
   }
 
   /**
