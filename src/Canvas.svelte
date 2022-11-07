@@ -1,41 +1,91 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte"
+  import { onMount } from "svelte"
+  import { createVector, CubeManager, type Point } from "./rubik"
+  import { cubeManager } from "./stores"
 
   let canvas: HTMLCanvasElement
   let wrapper: HTMLDivElement
   let hidden = true
-  let scale = 0.5
-  const canvasWidth = 1400
+  let canvasWidth = 700
+  let dragging = false
+  let touchPoint: Point
+  let timerId: NodeJS.Timeout | undefined
+  let dpr = window.devicePixelRatio
 
-  const adjustCanvasSize = () => {
-    scale = wrapper.clientWidth / canvasWidth
+  const onMouseDown = (e: MouseEvent) => {
+    dragStart({ x: e.offsetX, y: e.offsetY })
+  }
+
+  const onMouseMove = (e: MouseEvent) => {
+    if (dragging) {
+      drag({ x: e.offsetX, y: e.offsetY })
+    }
+  }
+
+  const onTouchStart = (e: TouchEvent) => {
+    const touch = e.touches[0]
+    const rect = canvas.getBoundingClientRect()
+    dragStart({
+      x: (touch.clientX - rect.x) * dpr,
+      y: (touch.clientY - rect.y) * dpr,
+    })
+  }
+
+  const onTouchMove = (e: TouchEvent) => {
+    const touch = e.touches[0]
+    const rect = canvas.getBoundingClientRect()
+    drag({
+      x: (touch.clientX - rect.x) * dpr,
+      y: (touch.clientY - rect.y) * dpr,
+    })
+  }
+
+  const dragStart = (p: Point) => {
+    dragging = true
+    touchPoint = p
+    console.log(touchPoint)
+  }
+
+  const drag = (p: Point) => {
+    $cubeManager.moveAngle(createVector(touchPoint, p))
+    $cubeManager.draw()
+    touchPoint = p
   }
 
   onMount(() => {
-    window.addEventListener("resize", adjustCanvasSize)
-    adjustCanvasSize()
-    hidden = false
+    window.addEventListener("resize", () => {
+      if (timerId != null) {
+        clearTimeout(timerId)
+      }
+      timerId = setTimeout(() => {
+        dpr = window.devicePixelRatio
+        const newWidth = wrapper.clientWidth * dpr
+        if (newWidth !== canvasWidth) {
+          canvasWidth = newWidth
+          $cubeManager.setScreenSize(canvasWidth)
+          requestAnimationFrame(() => $cubeManager.draw())
+        }
+      }, 200)
+    })
+
+    document.addEventListener("mouseup", (e) => {
+      e.preventDefault()
+      dragging = false
+    })
+
+    document.addEventListener("touchend", (e) => {
+      e.preventDefault()
+      dragging = false
+    })
 
     const ctx = canvas.getContext("2d")
 
     if (ctx != null) {
-      ctx.fillStyle = "#c00"
-      ctx.strokeStyle = "#333"
-      ctx.lineWidth = 4
-      ctx.beginPath()
-      ctx.moveTo(10, 10)
-      ctx.lineTo(400, 100)
-      ctx.lineTo(400, 500)
-      ctx.lineTo(10, 400)
-      ctx.lineTo(10, 10)
-      ctx.closePath()
-      ctx.fill()
-      ctx.stroke()
+      canvasWidth = wrapper.clientWidth * dpr
+      $cubeManager = new CubeManager(3, canvasWidth, ctx)
+      hidden = false
+      requestAnimationFrame(() => $cubeManager.draw())
     }
-  })
-
-  onDestroy(() => {
-    window.removeEventListener("resize", adjustCanvasSize)
   })
 </script>
 
@@ -45,8 +95,12 @@
     class:hidden
     width={canvasWidth}
     height={canvasWidth}
-    style="transform: scale({scale})"
+    style="transform: scale({1 / dpr})"
     bind:this={canvas}
+    on:mousedown|preventDefault={onMouseDown}
+    on:mousemove|preventDefault={onMouseMove}
+    on:touchstart|preventDefault={onTouchStart}
+    on:touchmove|preventDefault={onTouchMove}
   >
     お使いのブラウザは canvas に対応していません。
   </canvas>
@@ -54,13 +108,14 @@
 
 <style lang="scss">
   .canvas-wrapper {
-    --canvas-width: min(702px, 95vw, 85vh);
+    --canvas-width: min(702px, 95vw, 75vh);
     width: var(--canvas-width);
     height: var(--canvas-width);
     position: relative;
     margin-left: auto;
     margin-right: auto;
     border: 1px solid #ccc;
+    overflow: hidden;
   }
   .canvas {
     position: absolute;

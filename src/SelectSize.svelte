@@ -1,8 +1,13 @@
 <script lang="ts">
+  import { cubeManager } from "./stores"
+
   let selectedSize = 3
   const sizeOptions = [2, 3, 4, 5, 6, 7]
 
-  $: console.log(selectedSize)
+  $: {
+    $cubeManager?.setCol(selectedSize)
+    $cubeManager?.draw()
+  }
 </script>
 
 <div class="size">
