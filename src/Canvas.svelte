@@ -67,14 +67,15 @@
       }, 200)
     })
 
-    document.addEventListener("mouseup", (e) => {
-      e.preventDefault()
+    document.addEventListener("mouseup", () => {
       dragging = false
     })
 
     document.addEventListener("touchend", (e) => {
-      e.preventDefault()
-      dragging = false
+      if (dragging) {
+        e.preventDefault()
+        dragging = false
+      }
     })
 
     const ctx = canvas.getContext("2d")
