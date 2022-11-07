@@ -43,7 +43,6 @@
   const dragStart = (p: Point) => {
     dragging = true
     touchPoint = p
-    console.log(touchPoint)
   }
 
   const drag = (p: Point) => {
