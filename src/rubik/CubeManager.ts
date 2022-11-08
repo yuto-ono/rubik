@@ -134,6 +134,9 @@ export class CubeManager {
     this.animationId = requestAnimationFrame(animate)
   }
 
+  /**
+   * キューブ全体を回転（視点を動かす）
+   */
   private moveAngle(p: Point) {
     if (this.moveAngleId != null) {
       cancelAnimationFrame(this.moveAngleId)
