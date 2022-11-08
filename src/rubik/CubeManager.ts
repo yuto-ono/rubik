@@ -1,14 +1,19 @@
-import { MAX_RADIAN, ROTATION_SPEED } from "./constants"
+import {
+  MAX_RADIAN,
+  ROTATION_SPEED,
+  TRANSFER_RATE,
+  TURN_RATE,
+} from "./constants"
 import { createVector } from "./functions"
 import { Renderer } from "./Renderer"
-import type { Point, TransferParams, Vector } from "./types"
+import type { Point, TransferParams } from "./types"
 import { WholeCube } from "./WholeCube"
 
 const calcTransferParams = (screenSize: number): TransferParams => ({
-  transferRate: Math.round(screenSize * 0.75),
+  transferRate: screenSize * TRANSFER_RATE,
   screenSize,
   center: screenSize >> 1,
-  turnRate: 4 / screenSize,
+  turnRate: TURN_RATE / screenSize,
 })
 
 /**
