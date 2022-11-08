@@ -84,4 +84,11 @@ export class CubeManager {
   reset(): void {
     this.wholeCube.reset()
   }
+
+  /**
+   * シャッフル
+   */
+  shuffle(): void {
+    this.wholeCube.shuffle()
+  }
 }

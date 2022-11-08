@@ -2,6 +2,11 @@
   import Button from "./Button.svelte"
   import { cubeManager } from "./stores"
 
+  const shuffle = () => {
+    $cubeManager.shuffle()
+    $cubeManager.draw()
+  }
+
   const reset = () => {
     $cubeManager.reset()
     $cubeManager.draw()
@@ -10,7 +15,7 @@
 
 <div class="btn-list">
   <div class="btn-item">
-    <Button>シャッフル</Button>
+    <Button on:click={shuffle}>シャッフル</Button>
   </div>
   <div class="btn-item">
     <Button on:click={reset}>リセット</Button>

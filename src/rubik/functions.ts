@@ -33,6 +33,11 @@ export const innerProduct3D = (a: Vector3D, b: Vector3D): number => {
 }
 
 /**
+ * 乱数
+ */
+export const rand = (max: number): number => Math.floor(Math.random() * max)
+
+/**
  * 点p が、直線ab の左側にあるか
  */
 export const isLeftHand = (a: Point, b: Point, p: Point): boolean => {

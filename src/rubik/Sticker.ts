@@ -1,4 +1,7 @@
+import { rand } from "./functions"
 import type { Axis } from "./types"
+
+const randAxis = (): Axis => "xyz".charAt(rand(3)) as Axis
 
 export class Sticker {
   private col: number
@@ -26,6 +29,29 @@ export class Sticker {
       this.rotateRight(axis, row)
     }
     this.rotateRight(axis, row)
+  }
+
+  /**
+   * シャッフル
+   */
+  shuffle(): void {
+    const odd = (this.col & 1) === 1
+    const half = this.col >> 1
+    const randMax = half << 1
+    const max = this.col - 1
+    for (let i = 0; i < 100; i++) {
+      const _row = rand(randMax)
+      const row = odd && _row === half ? max : _row
+      const axis = randAxis()
+      const direction = rand(3)
+      if (direction >= 2) {
+        this.rotateRight(axis, row)
+      }
+      if (direction >= 1) {
+        this.rotateRight(axis, row)
+      }
+      this.rotateRight(axis, row)
+    }
   }
 
   /**

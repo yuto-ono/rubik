@@ -134,6 +134,14 @@ export class WholeCube {
   }
 
   /**
+   * シャッフル
+   */
+  shuffle(): void {
+    this.stiker.shuffle()
+    this.coloring()
+  }
+
+  /**
    * ベクトルをもとに回転軸を決定
    */
   detectAxis(v: Vector): boolean {
