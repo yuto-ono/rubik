@@ -113,9 +113,9 @@ export class WholeCube {
   }
 
   /**
-   * 回転をもとに戻す
+   * 回転をもとに戻し、色を並べかえる
    */
-  revert(): void {
+  revertAndColoring(): void {
     this.cubes.forEach((cube) => cube.revert())
     if (this.touchDetail != null) {
       const { row, direction } = this.touchDetail

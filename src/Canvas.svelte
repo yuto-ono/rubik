@@ -1,33 +1,32 @@
 <script lang="ts">
   import { onMount } from "svelte"
-  import { createVector, CubeManager, type Point } from "./rubik"
-  import { cubeManager, playing } from "./stores"
+  import { CubeManager } from "./rubik"
+  import { cubeManager } from "./stores"
 
   let canvas: HTMLCanvasElement
   let wrapper: HTMLDivElement
   let hidden = true
   let canvasWidth = 700
   let dragging = false
-  let faceTouched = false
-  let animating = false
-  let touchPoint: Point
-  let timerId: NodeJS.Timeout | undefined
+  let resizeTimer: NodeJS.Timeout | undefined
   let dpr = window.devicePixelRatio
 
   const onMouseDown = (e: MouseEvent) => {
-    dragStart({ x: e.offsetX, y: e.offsetY })
+    dragging = true
+    $cubeManager.dragStart({ x: e.offsetX, y: e.offsetY })
   }
 
   const onMouseMove = (e: MouseEvent) => {
     if (dragging) {
-      drag({ x: e.offsetX, y: e.offsetY })
+      $cubeManager.drag({ x: e.offsetX, y: e.offsetY })
     }
   }
 
   const onTouchStart = (e: TouchEvent) => {
     const touch = e.touches[0]
     const rect = canvas.getBoundingClientRect()
-    dragStart({
+    dragging = true
+    $cubeManager.dragStart({
       x: (touch.clientX - rect.x) * dpr,
       y: (touch.clientY - rect.y) * dpr,
     })
@@ -37,66 +36,25 @@
     const touch = e.touches[0]
     const rect = canvas.getBoundingClientRect()
     if (dragging) {
-      drag({
+      $cubeManager.drag({
         x: (touch.clientX - rect.x) * dpr,
         y: (touch.clientY - rect.y) * dpr,
       })
     }
   }
 
-  const dragStart = (p: Point) => {
-    dragging = true
-    touchPoint = p
-    faceTouched = $cubeManager.touch(p)
-  }
-
-  const drag = (p: Point) => {
-    if (faceTouched) {
-      if (!animating) {
-        const v = createVector(touchPoint, p)
-        if ($cubeManager.detectAxis(v)) {
-          animating = true
-          dragging = false
-          const startTime = performance.now()
-          const animate = () => {
-            const t = performance.now() - startTime
-            const rad = t / 200
-            if (rad < 1.57) {
-              $cubeManager.rotate(rad)
-              $cubeManager.draw()
-              requestAnimationFrame(animate)
-            } else {
-              $cubeManager.revert()
-              $cubeManager.draw()
-              animating = false
-              if ($playing && $cubeManager.judge()) {
-                $playing = false
-                requestAnimationFrame(() => alert("6面完成おめでとう！"))
-              }
-            }
-          }
-          requestAnimationFrame(animate)
-        }
-      }
-    } else {
-      $cubeManager.moveAngle(createVector(touchPoint, p))
-      $cubeManager.draw()
-      touchPoint = p
-    }
-  }
-
   onMount(() => {
     window.addEventListener("resize", () => {
-      if (timerId != null) {
-        clearTimeout(timerId)
+      if (resizeTimer != null) {
+        clearTimeout(resizeTimer)
       }
-      timerId = setTimeout(() => {
+      resizeTimer = setTimeout(() => {
         dpr = window.devicePixelRatio
         const newWidth = wrapper.clientWidth * dpr
         if (newWidth !== canvasWidth) {
           canvasWidth = newWidth
           $cubeManager.setScreenSize(canvasWidth)
-          requestAnimationFrame(() => $cubeManager.draw())
+          $cubeManager.drawAsync()
         }
       }, 200)
     })
@@ -118,7 +76,7 @@
       canvasWidth = wrapper.clientWidth * dpr
       $cubeManager = new CubeManager(3, canvasWidth, ctx)
       hidden = false
-      requestAnimationFrame(() => $cubeManager.draw())
+      $cubeManager.drawAsync()
     }
   })
 </script>

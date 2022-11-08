@@ -1,3 +1,5 @@
+import { MAX_RADIAN, ROTATION_SPEED } from "./constants"
+import { createVector } from "./functions"
 import { Renderer } from "./Renderer"
 import type { Point, TransferParams, Vector } from "./types"
 import { WholeCube } from "./WholeCube"
@@ -9,10 +11,18 @@ const calcTransferParams = (screenSize: number): TransferParams => ({
   turnRate: 4 / screenSize,
 })
 
+/**
+ * キューブ全体の管理やアニメーションなど
+ */
 export class CubeManager {
   private wholeCube: WholeCube
   private renderer: Renderer
   private tParams: TransferParams
+  private dragEnabled = true
+  private faceTouched = false
+  private playing = false
+  private previousPoint: Point = { x: 0, y: 0 }
+  private animationId: number | undefined
 
   constructor(col: number, screenSize: number, ctx: CanvasRenderingContext2D) {
     this.wholeCube = new WholeCube(col)
@@ -26,6 +36,7 @@ export class CubeManager {
   setCol(col: number): void {
     if (col !== this.wholeCube.col) {
       this.wholeCube = new WholeCube(col)
+      this.wholeCube.draw(this.renderer, this.tParams)
     }
   }
 
@@ -37,65 +48,94 @@ export class CubeManager {
   }
 
   /**
-   * キューブを描画
+   * キューブを描画（requestAnimationFrame使用）
    */
-  draw(): void {
-    this.wholeCube.draw(this.renderer, this.tParams)
-  }
-
-  /**
-   * キューブ全体を回転（視点を動かす）
-   */
-  moveAngle(v: Vector): void {
-    this.wholeCube.moveAngle(v, this.tParams)
-  }
-
-  /**
-   * タッチを試みる
-   */
-  touch(p: Point): boolean {
-    return this.wholeCube.touch(p)
-  }
-
-  /**
-   * ベクトルをもとに回転軸を決定
-   */
-  detectAxis(v: Vector): boolean {
-    return this.wholeCube.detectAxis(v)
-  }
-
-  /**
-   * キューブを回転する
-   */
-  rotate(rad: number): void {
-    this.wholeCube.rotate(rad)
-  }
-
-  /**
-   * 回転をもとに戻す
-   */
-  revert(): void {
-    this.wholeCube.revert()
+  drawAsync(): void {
+    requestAnimationFrame(() => {
+      this.wholeCube.draw(this.renderer, this.tParams)
+    })
   }
 
   /**
    * リセット
    */
   reset(): void {
+    this.playing = false
     this.wholeCube.reset()
+    this.wholeCube.draw(this.renderer, this.tParams)
   }
 
   /**
    * シャッフル
    */
   shuffle(): void {
+    this.playing = true
     this.wholeCube.shuffle()
+    this.wholeCube.draw(this.renderer, this.tParams)
   }
 
   /**
-   * 6面完成したかどうかを判定
+   * ドラッグ開始時の処理
    */
-  judge(): boolean {
-    return this.wholeCube.judge()
+  dragStart(p: Point) {
+    if (this.animationId != null) {
+      cancelAnimationFrame(this.animationId)
+      this.animationId = void 0
+      this.wholeCube.revertAndColoring()
+      this.wholeCube.draw(this.renderer, this.tParams)
+    }
+    this.dragEnabled = true
+    this.previousPoint = p
+    this.faceTouched = this.wholeCube.touch(p)
+  }
+
+  /**
+   * ドラッグ処理
+   */
+  drag(p: Point) {
+    if (this.dragEnabled) {
+      if (this.faceTouched) {
+        if (this.animationId == null) {
+          if (this.wholeCube.detectAxis(createVector(this.previousPoint, p))) {
+            this.animate()
+          }
+        }
+      } else {
+        this.moveAngle(p)
+      }
+    }
+  }
+
+  /**
+   * アニメーション
+   */
+  private animate(): void {
+    this.dragEnabled = false
+    const startTime = performance.now()
+    const animate = () => {
+      const t = performance.now() - startTime
+      const rad = t * ROTATION_SPEED
+      if (rad < MAX_RADIAN) {
+        this.wholeCube.rotate(rad)
+        this.wholeCube.draw(this.renderer, this.tParams)
+        this.animationId = requestAnimationFrame(animate)
+      } else {
+        this.wholeCube.revertAndColoring()
+        this.wholeCube.draw(this.renderer, this.tParams)
+        this.animationId = void 0
+        if (this.playing && this.wholeCube.judge()) {
+          this.playing = false
+          requestAnimationFrame(() => alert("6面完成おめでとう！"))
+        }
+      }
+    }
+
+    this.animationId = requestAnimationFrame(animate)
+  }
+
+  private moveAngle(p: Point) {
+    this.wholeCube.moveAngle(createVector(this.previousPoint, p), this.tParams)
+    this.wholeCube.draw(this.renderer, this.tParams)
+    this.previousPoint = p
   }
 }

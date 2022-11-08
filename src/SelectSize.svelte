@@ -4,10 +4,7 @@
   let selectedSize = 3
   const sizeOptions = [2, 3, 4, 5, 6, 7]
 
-  $: {
-    $cubeManager?.setCol(selectedSize)
-    $cubeManager?.draw()
-  }
+  $: $cubeManager?.setCol(selectedSize)
 </script>
 
 <div class="size">

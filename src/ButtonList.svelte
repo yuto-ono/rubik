@@ -1,26 +1,14 @@
 <script lang="ts">
   import Button from "./Button.svelte"
-  import { cubeManager, playing } from "./stores"
-
-  const shuffle = () => {
-    $cubeManager.shuffle()
-    $cubeManager.draw()
-    $playing = true
-  }
-
-  const reset = () => {
-    $cubeManager.reset()
-    $cubeManager.draw()
-    $playing = false
-  }
+  import { cubeManager } from "./stores"
 </script>
 
 <div class="btn-list">
   <div class="btn-item">
-    <Button on:click={shuffle}>シャッフル</Button>
+    <Button on:click={() => $cubeManager?.shuffle()}>シャッフル</Button>
   </div>
   <div class="btn-item">
-    <Button on:click={reset}>リセット</Button>
+    <Button on:click={() => $cubeManager?.reset()}>リセット</Button>
   </div>
 </div>
 
