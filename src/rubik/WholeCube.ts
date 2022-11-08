@@ -142,6 +142,13 @@ export class WholeCube {
   }
 
   /**
+   * 6面完成したかどうかを判定
+   */
+  judge(): boolean {
+    return this.stiker.judge()
+  }
+
+  /**
    * ベクトルをもとに回転軸を決定
    */
   detectAxis(v: Vector): boolean {

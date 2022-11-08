@@ -55,6 +55,16 @@ export class Sticker {
   }
 
   /**
+   * 6面完成したかどうかを判定
+   */
+  judge(): boolean {
+    return this.data.every((faceColors) => {
+      const firstColor = faceColors[0]
+      return faceColors.every((color) => color === firstColor)
+    })
+  }
+
+  /**
    * 右に回転
    */
   private rotateRight(axis: Axis, row: number): void {

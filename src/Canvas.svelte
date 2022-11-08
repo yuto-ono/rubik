@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte"
   import { createVector, CubeManager, type Point } from "./rubik"
-  import { cubeManager } from "./stores"
+  import { cubeManager, playing } from "./stores"
 
   let canvas: HTMLCanvasElement
   let wrapper: HTMLDivElement
@@ -69,6 +69,10 @@
               $cubeManager.revert()
               $cubeManager.draw()
               animating = false
+              if ($playing && $cubeManager.judge()) {
+                $playing = false
+                requestAnimationFrame(() => alert("6面完成おめでとう！"))
+              }
             }
           }
           requestAnimationFrame(animate)

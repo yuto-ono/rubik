@@ -91,4 +91,11 @@ export class CubeManager {
   shuffle(): void {
     this.wholeCube.shuffle()
   }
+
+  /**
+   * 6面完成したかどうかを判定
+   */
+  judge(): boolean {
+    return this.wholeCube.judge()
+  }
 }

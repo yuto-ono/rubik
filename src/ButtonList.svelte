@@ -1,15 +1,17 @@
 <script lang="ts">
   import Button from "./Button.svelte"
-  import { cubeManager } from "./stores"
+  import { cubeManager, playing } from "./stores"
 
   const shuffle = () => {
     $cubeManager.shuffle()
     $cubeManager.draw()
+    $playing = true
   }
 
   const reset = () => {
     $cubeManager.reset()
     $cubeManager.draw()
+    $playing = false
   }
 </script>
 
