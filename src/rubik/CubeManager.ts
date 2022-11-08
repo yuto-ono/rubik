@@ -23,6 +23,7 @@ export class CubeManager {
   private playing = false
   private previousPoint: Point = { x: 0, y: 0 }
   private animationId: number | undefined
+  private moveAngleId: number | undefined
 
   constructor(col: number, screenSize: number, ctx: CanvasRenderingContext2D) {
     this.wholeCube = new WholeCube(col)
@@ -134,8 +135,17 @@ export class CubeManager {
   }
 
   private moveAngle(p: Point) {
-    this.wholeCube.moveAngle(createVector(this.previousPoint, p), this.tParams)
-    this.wholeCube.draw(this.renderer, this.tParams)
-    this.previousPoint = p
+    if (this.moveAngleId != null) {
+      cancelAnimationFrame(this.moveAngleId)
+    }
+    this.moveAngleId = requestAnimationFrame(() => {
+      this.wholeCube.moveAngle(
+        createVector(this.previousPoint, p),
+        this.tParams
+      )
+      this.wholeCube.draw(this.renderer, this.tParams)
+      this.previousPoint = p
+      this.moveAngleId = void 0
+    })
   }
 }
