@@ -6,8 +6,8 @@ const colors = [
   "#090", // green
   "#e70", // orane
   "#00c", // blue
-  "#fff", //white
-  "#000", //black
+  "#fff", // white
+  "#000", // black
 ] as const
 
 /**
@@ -15,7 +15,7 @@ const colors = [
  */
 export class Renderer {
   constructor(private ctx: CanvasRenderingContext2D) {
-    ctx.strokeStyle = "#333"
+    ctx.strokeStyle = "#000"
     ctx.lineWidth = 1
   }
 
