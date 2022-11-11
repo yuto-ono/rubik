@@ -27,8 +27,8 @@ export class Vertex {
     const p = matrix.product(this.originalPoint)
     p.z += SCREEN_DISTANCE
     this.translatedPoint = p
-    this.screenPoint.x = Math.round((p.x * rate) / p.z) + center
-    this.screenPoint.y = Math.round((p.y * rate) / p.z) + center
+    this.screenPoint.x = (p.x * rate) / p.z + center
+    this.screenPoint.y = (p.y * rate) / p.z + center
   }
 
   /**
@@ -40,16 +40,16 @@ export class Vertex {
     const p = this.oldPoint
     switch (axis) {
       case "x":
-        this.originalPoint.y = Math.round(p.y * c - p.z * s)
-        this.originalPoint.z = Math.round(p.z * c + p.y * s)
+        this.originalPoint.y = p.y * c - p.z * s
+        this.originalPoint.z = p.z * c + p.y * s
         break
       case "y":
-        this.originalPoint.x = Math.round(p.x * c + p.z * s)
-        this.originalPoint.z = Math.round(p.z * c - p.x * s)
+        this.originalPoint.x = p.x * c + p.z * s
+        this.originalPoint.z = p.z * c - p.x * s
         break
       case "z":
-        this.originalPoint.x = Math.round(p.x * c - p.y * s)
-        this.originalPoint.y = Math.round(p.y * c + p.x * s)
+        this.originalPoint.x = p.x * c - p.y * s
+        this.originalPoint.y = p.y * c + p.x * s
         break
     }
   }

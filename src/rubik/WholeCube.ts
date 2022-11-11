@@ -1,7 +1,7 @@
 import { CUBE_SIZE, DRAG_LIMIT } from "./constants"
 import { Cube } from "./Cube"
+import type { Face } from "./Face"
 import { Matrix } from "./Matrix"
-import type { Renderer } from "./Renderer"
 import { Sticker } from "./Sticker"
 import type { Axis, Point, TouchDetail, TransferParams, Vector } from "./types"
 
@@ -60,13 +60,12 @@ export class WholeCube {
   }
 
   /**
-   * キューブ全体を描画
+   * 見える面のリストを作成
    */
-  draw(renderer: Renderer, tParams: TransferParams): void {
+  getVisibleFaces(tParams: TransferParams): Face[] {
     this.transfer(tParams)
     this.sort()
-    renderer.clear(tParams)
-    this.sortedCubes.forEach((cube) => cube.draw(renderer))
+    return this.sortedCubes.flatMap((cube) => cube.getVisibleFaces())
   }
 
   /**

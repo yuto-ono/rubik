@@ -4,8 +4,8 @@ import {
   TRANSFER_RATE,
   TURN_RATE,
 } from "./constants"
+import type { Face } from "./Face"
 import { createVector } from "./functions"
-import { Renderer } from "./Renderer"
 import type { Point, TransferParams } from "./types"
 import { WholeCube } from "./WholeCube"
 
@@ -21,7 +21,6 @@ const calcTransferParams = (screenSize: number): TransferParams => ({
  */
 export class CubeManager {
   private wholeCube: WholeCube
-  private renderer: Renderer
   private tParams: TransferParams
   private dragEnabled = true
   private faceTouched = false
@@ -29,11 +28,11 @@ export class CubeManager {
   private previousPoint: Point = { x: 0, y: 0 }
   private animationId?: number
   private moveAngleId?: number
+  private facesSubscriber?: (faces: Face[]) => void
   private fpsSubscriber?: (fps: number) => void
 
-  constructor(col: number, screenSize: number, ctx: CanvasRenderingContext2D) {
+  constructor(col: number, screenSize: number) {
     this.wholeCube = new WholeCube(col)
-    this.renderer = new Renderer(ctx)
     this.tParams = calcTransferParams(screenSize)
   }
 
@@ -43,7 +42,7 @@ export class CubeManager {
   setCol(col: number): void {
     if (col !== this.wholeCube.col) {
       this.wholeCube = new WholeCube(col)
-      this.wholeCube.draw(this.renderer, this.tParams)
+      this.draw()
     }
   }
 
@@ -55,21 +54,12 @@ export class CubeManager {
   }
 
   /**
-   * キューブを描画（requestAnimationFrame使用）
-   */
-  drawAsync(): void {
-    requestAnimationFrame(() => {
-      this.wholeCube.draw(this.renderer, this.tParams)
-    })
-  }
-
-  /**
    * リセット
    */
   reset(): void {
     this.playing = false
     this.wholeCube.reset()
-    this.wholeCube.draw(this.renderer, this.tParams)
+    this.draw()
   }
 
   /**
@@ -78,18 +68,18 @@ export class CubeManager {
   shuffle(): void {
     this.playing = true
     this.wholeCube.shuffle()
-    this.wholeCube.draw(this.renderer, this.tParams)
+    this.draw()
   }
 
   /**
    * ドラッグ開始時の処理
    */
-  dragStart(p: Point) {
+  dragStart(p: Point): void {
     if (this.animationId != null) {
       cancelAnimationFrame(this.animationId)
       this.animationId = void 0
       this.wholeCube.revertAndColoring()
-      this.wholeCube.draw(this.renderer, this.tParams)
+      this.draw()
     }
     this.dragEnabled = true
     this.previousPoint = p
@@ -99,7 +89,7 @@ export class CubeManager {
   /**
    * ドラッグ処理
    */
-  drag(p: Point) {
+  drag(p: Point): void {
     if (this.dragEnabled) {
       if (this.faceTouched) {
         if (this.animationId == null) {
@@ -111,6 +101,22 @@ export class CubeManager {
         this.moveAngle(p)
       }
     }
+  }
+
+  /**
+   * キューブを描画
+   */
+  draw(): void {
+    if (this.facesSubscriber != null) {
+      this.facesSubscriber(this.wholeCube.getVisibleFaces(this.tParams))
+    }
+  }
+
+  /**
+   * Faces を購読するコールバック関数を設定
+   */
+  subscribeFaces(subscriber: (faces: Face[]) => void): void {
+    this.facesSubscriber = subscriber
   }
 
   /**
@@ -132,12 +138,12 @@ export class CubeManager {
       const rad = t * ROTATION_SPEED
       if (rad < MAX_RADIAN) {
         this.wholeCube.rotate(rad)
-        this.wholeCube.draw(this.renderer, this.tParams)
+        this.draw()
         this.animationId = requestAnimationFrame(animate)
         frameCount++
       } else {
         this.wholeCube.revertAndColoring()
-        this.wholeCube.draw(this.renderer, this.tParams)
+        this.draw()
         this.animationId = void 0
         frameCount++
         if (this.fpsSubscriber != null) {
@@ -165,7 +171,7 @@ export class CubeManager {
         createVector(this.previousPoint, p),
         this.tParams
       )
-      this.wholeCube.draw(this.renderer, this.tParams)
+      this.draw()
       this.previousPoint = p
       this.moveAngleId = void 0
     })
