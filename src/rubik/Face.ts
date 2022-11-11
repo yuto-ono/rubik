@@ -1,3 +1,4 @@
+import type { Cube } from "./Cube"
 import {
   createVector,
   createVector3D,
@@ -6,7 +7,6 @@ import {
   isLeftHand,
   unitVector,
 } from "./functions"
-import type { Renderer } from "./Renderer"
 import type { AxisAndDirection, Point, Vector } from "./types"
 import type { Vertex } from "./Vertex"
 
@@ -15,9 +15,10 @@ import type { Vertex } from "./Vertex"
  */
 export class Face {
   visible = false
-  private color = 6
+  color = 6
 
   constructor(
+    public belongingCube: Cube,
     private v1: Vertex,
     private v2: Vertex,
     private v3: Vertex,
@@ -41,19 +42,6 @@ export class Face {
   }
 
   /**
-   * 面を描画
-   */
-  draw(renderer: Renderer): void {
-    renderer.fillQuadrangle(
-      this.v1.screenPoint,
-      this.v2.screenPoint,
-      this.v3.screenPoint,
-      this.v4.screenPoint,
-      this.color
-    )
-  }
-
-  /**
    * 点が面の内側にあるか
    */
   isInside(p: Point): boolean {
@@ -64,6 +52,18 @@ export class Face {
       isLeftHand(this.v3.screenPoint, this.v4.screenPoint, p) &&
       isLeftHand(this.v4.screenPoint, this.v1.screenPoint, p)
     )
+  }
+
+  /**
+   * 2次元座標の配列を取得
+   */
+  getPoints(): Point[] {
+    return [
+      this.v1.screenPoint,
+      this.v2.screenPoint,
+      this.v3.screenPoint,
+      this.v4.screenPoint,
+    ]
   }
 
   /**

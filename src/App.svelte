@@ -1,12 +1,12 @@
 <script lang="ts">
   import ButtonList from "./ButtonList.svelte"
-  import Canvas from "./Canvas.svelte"
+  import Screen from "./Screen.svelte"
   import SelectSize from "./SelectSize.svelte"
 </script>
 
 <main class="main">
   <h1 class="title">ルービックキューブ</h1>
-  <Canvas />
+  <Screen />
   <SelectSize />
   <ButtonList />
 </main>

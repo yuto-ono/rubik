@@ -1,6 +1,5 @@
 import { Face } from "./Face"
 import type { Matrix } from "./Matrix"
-import type { Renderer } from "./Renderer"
 import type { Axis, Point, Point3D, TouchInfo, TransferParams } from "./types"
 import { Vertex } from "./Vertex"
 
@@ -26,12 +25,12 @@ export class Cube {
 
     this.vertexes = v
     this.faces = [
-      new Face(v[0], v[3], v[2], v[1], v[4]),
-      new Face(v[5], v[4], v[0], v[1], v[6]),
-      new Face(v[1], v[2], v[6], v[5], v[0]),
-      new Face(v[2], v[3], v[7], v[6], v[1]),
-      new Face(v[3], v[0], v[4], v[7], v[2]),
-      new Face(v[7], v[4], v[5], v[6], v[3]),
+      new Face(this, v[0], v[3], v[2], v[1], v[4]),
+      new Face(this, v[5], v[4], v[0], v[1], v[6]),
+      new Face(this, v[1], v[2], v[6], v[5], v[0]),
+      new Face(this, v[2], v[3], v[7], v[6], v[1]),
+      new Face(this, v[3], v[0], v[4], v[7], v[2]),
+      new Face(this, v[7], v[4], v[5], v[6], v[3]),
     ]
   }
 
@@ -46,14 +45,10 @@ export class Cube {
   }
 
   /**
-   * キューブを描画
+   * 見える面のリスト
    */
-  draw(renderer: Renderer): void {
-    this.faces.forEach((face) => {
-      if (face.visible) {
-        face.draw(renderer)
-      }
-    })
+  getVisibleFaces(): Face[] {
+    return this.faces.filter((face) => face.visible)
   }
 
   /**
