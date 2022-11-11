@@ -15,6 +15,7 @@ export class CubeManager {
   private animationId?: number
   private moveAngleId?: number
   private facesSubscriber?: (faces: Face[]) => void
+  private fpsSubscriber?: (fps: number) => void
 
   constructor(col: number) {
     this.wholeCube = new WholeCube(col)
@@ -103,11 +104,19 @@ export class CubeManager {
   }
 
   /**
+   * FPSを購読するコールバック関数を設定
+   */
+  subscribeFps(subscriber: (fps: number) => void) {
+    this.fpsSubscriber = subscriber
+  }
+
+  /**
    * アニメーション
    */
   private animate(): void {
     this.dragEnabled = false
     const startTime = performance.now()
+    let frameCount = 0
     const animate = () => {
       const t = performance.now() - startTime
       const rad = t * ROTATION_SPEED
@@ -115,10 +124,15 @@ export class CubeManager {
         this.wholeCube.rotate(rad)
         this.draw()
         this.animationId = requestAnimationFrame(animate)
+        frameCount++
       } else {
         this.wholeCube.revertAndColoring()
         this.draw()
         this.animationId = void 0
+        frameCount++
+        if (this.fpsSubscriber != null) {
+          this.fpsSubscriber((frameCount / t) * 1000)
+        }
         if (this.playing && this.wholeCube.judge()) {
           this.playing = false
           requestAnimationFrame(() => alert("6面完成おめでとう！"))
