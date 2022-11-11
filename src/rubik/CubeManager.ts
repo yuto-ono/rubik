@@ -27,8 +27,8 @@ export class CubeManager {
   private faceTouched = false
   private playing = false
   private previousPoint: Point = { x: 0, y: 0 }
-  private animationId: number | undefined
-  private moveAngleId: number | undefined
+  private animationId?: number
+  private moveAngleId?: number
 
   constructor(col: number, screenSize: number, ctx: CanvasRenderingContext2D) {
     this.wholeCube = new WholeCube(col)
