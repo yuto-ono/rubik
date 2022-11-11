@@ -1,6 +1,7 @@
 <script lang="ts">
   import ButtonList from "./ButtonList.svelte"
   import Canvas from "./Canvas.svelte"
+  import Fps from "./Fps.svelte"
   import SelectSize from "./SelectSize.svelte"
 </script>
 
@@ -9,6 +10,7 @@
   <Canvas />
   <SelectSize />
   <ButtonList />
+  <Fps />
 </main>
 
 <style lang="scss">
