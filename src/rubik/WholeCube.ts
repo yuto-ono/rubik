@@ -1,9 +1,9 @@
-import { CUBE_SIZE, DRAG_LIMIT } from "./constants"
+import { CUBE_SIZE, DRAG_LIMIT, TURN_RATE } from "./constants"
 import { Cube } from "./Cube"
 import type { Face } from "./Face"
 import { Matrix } from "./Matrix"
 import { Sticker } from "./Sticker"
-import type { Axis, TouchDetail, TransferParams, Vector } from "./types"
+import type { Axis, TouchDetail, Vector } from "./types"
 
 type IndexGetter = (col: number, x: number, y: number, z: number) => number
 type RowGetter = (col: number, i: number) => number
@@ -62,8 +62,8 @@ export class WholeCube {
   /**
    * 見える面のリストを作成
    */
-  getVisibleFaces(tParams: TransferParams): Face[] {
-    this.transfer(tParams)
+  getVisibleFaces(): Face[] {
+    this.transfer()
     this.sort()
     return this.sortedCubes.flatMap((cube) => cube.getVisibleFaces())
   }
@@ -71,9 +71,9 @@ export class WholeCube {
   /**
    * キューブ全体を回転（視点を動かす）
    */
-  moveAngle(v: Vector, { turnRate }: TransferParams): void {
-    this.matrix.rotX(v.x * turnRate)
-    this.matrix.rotY(v.y * turnRate)
+  moveAngle(v: Vector): void {
+    this.matrix.rotX(v.x * TURN_RATE)
+    this.matrix.rotY(v.y * TURN_RATE)
   }
 
   /**
@@ -169,8 +169,8 @@ export class WholeCube {
   /**
    * 座標変換
    */
-  private transfer(tParams: TransferParams): void {
-    this.cubes.forEach((cube) => cube.transfer(this.matrix, tParams))
+  private transfer(): void {
+    this.cubes.forEach((cube) => cube.transfer(this.matrix))
   }
 
   /**

@@ -1,27 +1,14 @@
-import {
-  MAX_RADIAN,
-  ROTATION_SPEED,
-  TRANSFER_RATE,
-  TURN_RATE,
-} from "./constants"
+import { MAX_RADIAN, ROTATION_SPEED } from "./constants"
 import type { Face } from "./Face"
 import { createVector } from "./functions"
-import type { Point, TransferParams } from "./types"
+import type { Point } from "./types"
 import { WholeCube } from "./WholeCube"
-
-const calcTransferParams = (screenSize: number): TransferParams => ({
-  transferRate: screenSize * TRANSFER_RATE,
-  screenSize,
-  center: screenSize >> 1,
-  turnRate: TURN_RATE / screenSize,
-})
 
 /**
  * キューブ全体の管理やアニメーションなど
  */
 export class CubeManager {
   private wholeCube: WholeCube
-  private tParams: TransferParams
   private dragEnabled = true
   private playing = false
   private previousPoint: Point = { x: 0, y: 0 }
@@ -29,9 +16,8 @@ export class CubeManager {
   private moveAngleId?: number
   private facesSubscriber?: (faces: Face[]) => void
 
-  constructor(col: number, screenSize: number) {
+  constructor(col: number) {
     this.wholeCube = new WholeCube(col)
-    this.tParams = calcTransferParams(screenSize)
   }
 
   /**
@@ -104,7 +90,7 @@ export class CubeManager {
    */
   draw(): void {
     if (this.facesSubscriber != null) {
-      this.facesSubscriber(this.wholeCube.getVisibleFaces(this.tParams))
+      this.facesSubscriber(this.wholeCube.getVisibleFaces())
     }
   }
 
@@ -162,10 +148,7 @@ export class CubeManager {
       cancelAnimationFrame(this.moveAngleId)
     }
     this.moveAngleId = requestAnimationFrame(() => {
-      this.wholeCube.moveAngle(
-        createVector(this.previousPoint, p),
-        this.tParams
-      )
+      this.wholeCube.moveAngle(createVector(this.previousPoint, p))
       this.draw()
       this.previousPoint = p
       this.moveAngleId = void 0

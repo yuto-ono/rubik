@@ -28,16 +28,6 @@ export type Point3D = {
 export type Vector3D = Point3D
 
 /**
- * 座標変換になどに使うパラメータ
- */
-export type TransferParams = {
-  transferRate: number
-  screenSize: number
-  center: number
-  turnRate: number
-}
-
-/**
  * 回転軸
  */
 export type Axis = "x" | "y" | "z"
