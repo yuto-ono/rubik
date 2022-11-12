@@ -1,6 +1,6 @@
 import { Face } from "./Face"
 import type { Matrix } from "./Matrix"
-import type { Axis, Point, Point3D, TouchInfo, TransferParams } from "./types"
+import type { Axis, Point3D, TransferParams } from "./types"
 import { Vertex } from "./Vertex"
 
 /**
@@ -25,12 +25,12 @@ export class Cube {
 
     this.vertexes = v
     this.faces = [
-      new Face(this, v[0], v[3], v[2], v[1], v[4]),
-      new Face(this, v[5], v[4], v[0], v[1], v[6]),
-      new Face(this, v[1], v[2], v[6], v[5], v[0]),
-      new Face(this, v[2], v[3], v[7], v[6], v[1]),
-      new Face(this, v[3], v[0], v[4], v[7], v[2]),
-      new Face(this, v[7], v[4], v[5], v[6], v[3]),
+      new Face(this, 0, v[0], v[3], v[2], v[1], v[4]),
+      new Face(this, 1, v[5], v[4], v[0], v[1], v[6]),
+      new Face(this, 2, v[1], v[2], v[6], v[5], v[0]),
+      new Face(this, 3, v[2], v[3], v[7], v[6], v[1]),
+      new Face(this, 4, v[3], v[0], v[4], v[7], v[2]),
+      new Face(this, 5, v[7], v[4], v[5], v[6], v[3]),
     ]
   }
 
@@ -56,18 +56,6 @@ export class Cube {
    */
   isFaceVisible(i: number): boolean {
     return this.faces[i].visible
-  }
-
-  /**
-   * 面へのタッチを試みる タッチできたら面の情報を返す
-   */
-  touch(p: Point): TouchInfo | undefined {
-    for (let i = 0; i < this.faces.length; i++) {
-      const face = this.faces[i]
-      if (face.isInside(p)) {
-        return { face, faceIndex: i }
-      }
-    }
   }
 
   /**

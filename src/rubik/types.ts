@@ -47,16 +47,10 @@ export type Axis = "x" | "y" | "z"
  */
 export type TouchDetail = {
   face: Face
-  faceIndex: number
   cubeIndex: number
   row: number
   direction: boolean
 }
-
-/**
- * タッチした面の情報
- */
-export type TouchInfo = Pick<TouchDetail, "faceIndex" | "face">
 
 /**
  * 回転軸と回転方向

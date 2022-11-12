@@ -3,7 +3,7 @@ import { Cube } from "./Cube"
 import type { Face } from "./Face"
 import { Matrix } from "./Matrix"
 import { Sticker } from "./Sticker"
-import type { Axis, Point, TouchDetail, TransferParams, Vector } from "./types"
+import type { Axis, TouchDetail, TransferParams, Vector } from "./types"
 
 type IndexGetter = (col: number, x: number, y: number, z: number) => number
 type RowGetter = (col: number, i: number) => number
@@ -29,7 +29,7 @@ export class WholeCube {
   private sortedCubes: Cube[] = []
   private axis: Axis = "z"
   private matrix: Matrix
-  private touchDetail: TouchDetail | undefined
+  private touchDetail?: TouchDetail
   private stiker: Sticker
 
   constructor(col: number) {
@@ -77,23 +77,23 @@ export class WholeCube {
   }
 
   /**
-   * タッチを試みる
-   * タッチできたら、タッチした面を保存して true を返す
+   * 面にタッチ
    */
-  touch(p: Point): boolean {
-    for (const cube of [...this.sortedCubes].reverse()) {
-      const touchInfo = cube.touch(p)
-      if (touchInfo != null) {
-        this.touchDetail = {
-          ...touchInfo,
-          cubeIndex: this.cubes.indexOf(cube),
-          row: 0,
-          direction: false,
-        }
-        return true
-      }
+  touch(face: Face): void {
+    this.touchDetail = {
+      face,
+      cubeIndex: this.cubes.indexOf(face.belongingCube),
+      row: 0,
+      direction: false,
     }
-    return false
+  }
+
+  clearTouchInfo(): void {
+    this.touchDetail = void 0
+  }
+
+  faceTouched(): boolean {
+    return this.touchDetail != null
   }
 
   /**
@@ -158,8 +158,8 @@ export class WholeCube {
       return false
     }
 
-    const { face, faceIndex } = this.touchDetail
-    const { axis, direction } = face.detectAxis(v, faceIndex)
+    const { face } = this.touchDetail
+    const { axis, direction } = face.detectAxis(v)
     this.axis = axis
     this.touchDetail.direction = direction
     this.touchDetail.row = this.getRow(this.touchDetail.cubeIndex)
