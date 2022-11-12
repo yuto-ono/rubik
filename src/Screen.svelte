@@ -6,7 +6,7 @@
   let svgElement: SVGSVGElement
   let dragging = false
 
-  $cubeManager = new CubeManager(3, 700)
+  $cubeManager = new CubeManager(3)
   $cubeManager.subscribeFaces((_faces) => {
     faces = _faces
   })

@@ -1,6 +1,6 @@
 import { Face } from "./Face"
 import type { Matrix } from "./Matrix"
-import type { Axis, Point3D, TransferParams } from "./types"
+import type { Axis, Point3D } from "./types"
 import { Vertex } from "./Vertex"
 
 /**
@@ -37,8 +37,8 @@ export class Cube {
   /**
    * 座標変換
    */
-  transfer(matrix: Matrix, tParams: TransferParams): void {
-    this.vertexes.forEach((vertex) => vertex.transfer(matrix, tParams))
+  transfer(matrix: Matrix): void {
+    this.vertexes.forEach((vertex) => vertex.transfer(matrix))
     this.faces.forEach((face) => {
       face.calcVisible()
     })

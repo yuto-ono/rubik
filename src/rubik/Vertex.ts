@@ -1,6 +1,6 @@
-import { SCREEN_DISTANCE } from "./constants"
+import { CENTER, SCREEN_DISTANCE, TRANSFER_RATE } from "./constants"
 import type { Matrix } from "./Matrix"
-import type { Point3D, Point, TransferParams, Axis } from "./types"
+import type { Point3D, Point, Axis } from "./types"
 
 /**
  * 頂点
@@ -20,15 +20,12 @@ export class Vertex {
   /**
    * 3D座標を2D座標に変換
    */
-  transfer(
-    matrix: Matrix,
-    { transferRate: rate, center }: TransferParams
-  ): void {
+  transfer(matrix: Matrix): void {
     const p = matrix.product(this.originalPoint)
     p.z += SCREEN_DISTANCE
     this.translatedPoint = p
-    this.screenPoint.x = (p.x * rate) / p.z + center
-    this.screenPoint.y = (p.y * rate) / p.z + center
+    this.screenPoint.x = (p.x * TRANSFER_RATE) / p.z + CENTER
+    this.screenPoint.y = (p.y * TRANSFER_RATE) / p.z + CENTER
   }
 
   /**
