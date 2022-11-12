@@ -13,12 +13,23 @@
   $cubeManager.draw()
 
   const pointsToString = (points: Point[]): string => {
-    return points.map((point) => `${point.x},${point.y}`).join(" ")
+    return points
+      .map((point) => `${point.x.toFixed(2)},${point.y.toFixed(2)}`)
+      .join(" ")
   }
 
   const translatePoint = (point: Point): Point => {
     const ratio = 700 / svgElement.clientWidth
     return { x: point.x * ratio, y: point.y * ratio }
+  }
+
+  const getTouchPoint = (e: TouchEvent): Point => {
+    const touch = e.touches[0]
+    const rect = svgElement.getBoundingClientRect()
+    return translatePoint({
+      x: touch.clientX - rect.x,
+      y: touch.clientY - rect.y,
+    })
   }
 
   const onMouseDown = (e: MouseEvent) => {
@@ -33,28 +44,24 @@
   }
 
   const onTouchStart = (e: TouchEvent) => {
-    const touch = e.touches[0]
-    const rect = svgElement.getBoundingClientRect()
     dragging = true
-    $cubeManager.dragStart(
-      translatePoint({
-        x: touch.clientX - rect.x,
-        y: touch.clientY - rect.y,
-      })
-    )
+    $cubeManager.dragStart(getTouchPoint(e))
   }
 
   const onTouchMove = (e: TouchEvent) => {
-    const touch = e.touches[0]
-    const rect = svgElement.getBoundingClientRect()
     if (dragging) {
-      $cubeManager.drag(
-        translatePoint({
-          x: touch.clientX - rect.x,
-          y: touch.clientY - rect.y,
-        })
-      )
+      $cubeManager.drag(getTouchPoint(e))
     }
+  }
+
+  const faceMouseDown = (e: MouseEvent, face: Face) => {
+    dragging = true
+    $cubeManager.touch(translatePoint({ x: e.offsetX, y: e.offsetY }), face)
+  }
+
+  const faceTouchStart = (e: TouchEvent, face: Face) => {
+    dragging = true
+    $cubeManager.touch(getTouchPoint(e), face)
   }
 
   document.addEventListener("mouseup", () => {
@@ -80,10 +87,19 @@
     on:touchmove|preventDefault={onTouchMove}
   >
     {#each faces as face (face)}
-      <polygon
-        class="polygon color-{face.color}"
-        points={pointsToString(face.getPoints())}
-      />
+      {#if face.colored}
+        <polygon
+          class="polygon color-{face.color}"
+          points={pointsToString(face.getPoints())}
+          on:mousedown|stopPropagation={(e) => faceMouseDown(e, face)}
+          on:touchstart|stopPropagation={(e) => faceTouchStart(e, face)}
+        />
+      {:else}
+        <polygon
+          class="polygon color-{face.color}"
+          points={pointsToString(face.getPoints())}
+        />
+      {/if}
     {/each}
   </svg>
 </div>

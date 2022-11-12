@@ -38,13 +38,6 @@ export const innerProduct3D = (a: Vector3D, b: Vector3D): number => {
 export const rand = (max: number): number => Math.floor(Math.random() * max)
 
 /**
- * 点p が、直線ab の左側にあるか
- */
-export const isLeftHand = (a: Point, b: Point, p: Point): boolean => {
-  return (b.y - a.y) * (p.x - a.x) <= (b.x - a.x) * (p.y - a.y)
-}
-
-/**
  * ベクトルの長さを揃える
  */
 export const unitVector = (v: Vector): Vector => {

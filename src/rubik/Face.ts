@@ -4,7 +4,6 @@ import {
   createVector3D,
   innerProduct,
   innerProduct3D,
-  isLeftHand,
   unitVector,
 } from "./functions"
 import type { AxisAndDirection, Point, Vector } from "./types"
@@ -16,9 +15,11 @@ import type { Vertex } from "./Vertex"
 export class Face {
   visible = false
   color = 6
+  colored = false
 
   constructor(
     public belongingCube: Cube,
+    public index: number,
     private v1: Vertex,
     private v2: Vertex,
     private v3: Vertex,
@@ -31,6 +32,7 @@ export class Face {
    */
   setColor(color: number): void {
     this.color = color
+    this.colored = true
   }
 
   /**
@@ -39,19 +41,6 @@ export class Face {
   calcVisible(): void {
     const v = createVector3D(this.v1.translatedPoint, this.v5.translatedPoint)
     this.visible = innerProduct3D(v, this.v1.translatedPoint) > 0
-  }
-
-  /**
-   * 点が面の内側にあるか
-   */
-  isInside(p: Point): boolean {
-    return (
-      this.visible &&
-      isLeftHand(this.v1.screenPoint, this.v2.screenPoint, p) &&
-      isLeftHand(this.v2.screenPoint, this.v3.screenPoint, p) &&
-      isLeftHand(this.v3.screenPoint, this.v4.screenPoint, p) &&
-      isLeftHand(this.v4.screenPoint, this.v1.screenPoint, p)
-    )
   }
 
   /**
@@ -69,14 +58,14 @@ export class Face {
   /**
    * ベクトルをもとに回転軸と回転方向を決定
    */
-  detectAxis(v: Vector, faceIndex: number): AxisAndDirection {
+  detectAxis(v: Vector): AxisAndDirection {
     const v1 = unitVector(
-      faceIndex === 1
+      this.index === 1
         ? createVector(this.v2.screenPoint, this.v1.screenPoint)
         : createVector(this.v1.screenPoint, this.v2.screenPoint)
     )
     const v2 = unitVector(
-      faceIndex === 0 || faceIndex === 2
+      this.index === 0 || this.index === 2
         ? createVector(this.v4.screenPoint, this.v1.screenPoint)
         : createVector(this.v1.screenPoint, this.v4.screenPoint)
     )

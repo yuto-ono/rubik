@@ -23,7 +23,6 @@ export class CubeManager {
   private wholeCube: WholeCube
   private tParams: TransferParams
   private dragEnabled = true
-  private faceTouched = false
   private playing = false
   private previousPoint: Point = { x: 0, y: 0 }
   private animationId?: number
@@ -43,13 +42,6 @@ export class CubeManager {
       this.wholeCube = new WholeCube(col)
       this.draw()
     }
-  }
-
-  /**
-   * スクリーンサイズを変更
-   */
-  setScreenSize(screenSize: number): void {
-    this.tParams = calcTransferParams(screenSize)
   }
 
   /**
@@ -74,15 +66,20 @@ export class CubeManager {
    * ドラッグ開始時の処理
    */
   dragStart(p: Point): void {
-    if (this.animationId != null) {
-      cancelAnimationFrame(this.animationId)
-      this.animationId = void 0
-      this.wholeCube.revertAndColoring()
-      this.draw()
-    }
+    this.abortAnimation()
     this.dragEnabled = true
     this.previousPoint = p
-    this.faceTouched = this.wholeCube.touch(p)
+    this.wholeCube.clearTouchInfo()
+  }
+
+  /**
+   * 面にタッチ
+   */
+  touch(p: Point, face: Face): void {
+    this.abortAnimation()
+    this.wholeCube.touch(face)
+    this.dragEnabled = true
+    this.previousPoint = p
   }
 
   /**
@@ -90,7 +87,7 @@ export class CubeManager {
    */
   drag(p: Point): void {
     if (this.dragEnabled) {
-      if (this.faceTouched) {
+      if (this.wholeCube.faceTouched()) {
         if (this.animationId == null) {
           if (this.wholeCube.detectAxis(createVector(this.previousPoint, p))) {
             this.animate()
@@ -143,6 +140,18 @@ export class CubeManager {
     }
 
     this.animationId = requestAnimationFrame(animate)
+  }
+
+  /**
+   * アニメーション中止
+   */
+  private abortAnimation(): void {
+    if (this.animationId != null) {
+      cancelAnimationFrame(this.animationId)
+      this.animationId = void 0
+      this.wholeCube.revertAndColoring()
+      this.draw()
+    }
   }
 
   /**
