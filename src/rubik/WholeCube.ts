@@ -72,8 +72,8 @@ export class WholeCube {
    * キューブ全体を回転（視点を動かす）
    */
   moveAngle(v: Vector): void {
-    this.matrix.rotX(v.x * TURN_RATE)
-    this.matrix.rotY(v.y * TURN_RATE)
+    this.matrix.rotateX(v.x * TURN_RATE)
+    this.matrix.rotateY(v.y * TURN_RATE)
   }
 
   /**

@@ -7,8 +7,8 @@ export class Matrix {
   private data: number[] = [1, 0, 0, 0, 1, 0, 0, 0, 1]
 
   constructor() {
-    this.rotX(-0.5)
-    this.rotY(0.5)
+    this.rotateX(-0.5)
+    this.rotateY(0.5)
   }
 
   /**
@@ -26,7 +26,7 @@ export class Matrix {
   /**
    * X軸を中心に回転
    */
-  rotX(angle: number): void {
+  rotateX(angle: number): void {
     const s = Math.sin(angle)
     const c = Math.cos(angle)
     const d = this.data
@@ -46,7 +46,7 @@ export class Matrix {
   /**
    * Y軸を中心に回転
    */
-  rotY(angle: number): void {
+  rotateY(angle: number): void {
     const s = Math.sin(angle)
     const c = Math.cos(angle)
     const d = this.data
