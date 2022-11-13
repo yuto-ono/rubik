@@ -6,6 +6,11 @@ import type { Vector3D } from "./types"
 export class Matrix {
   private data: number[] = [1, 0, 0, 0, 1, 0, 0, 0, 1]
 
+  constructor() {
+    this.rotX(-0.5)
+    this.rotY(0.5)
+  }
+
   /**
    * ベクトルとの積
    */
