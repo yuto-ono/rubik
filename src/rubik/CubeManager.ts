@@ -27,6 +27,7 @@ export class CubeManager {
     if (col !== this.wholeCube.col) {
       this.wholeCube = new WholeCube(col)
       this.draw()
+      this.playing = false
     }
   }
 
