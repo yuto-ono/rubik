@@ -3,6 +3,9 @@ import type { Axis } from "./types"
 
 const randAxis = (): Axis => "xyz".charAt(rand(3)) as Axis
 
+/**
+ * キューブの色を管理
+ */
 export class Sticker {
   private col: number
   data: number[][]
