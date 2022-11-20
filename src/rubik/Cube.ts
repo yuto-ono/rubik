@@ -39,9 +39,7 @@ export class Cube {
    */
   transfer(matrix: Matrix): void {
     this.vertexes.forEach((vertex) => vertex.transfer(matrix))
-    this.faces.forEach((face) => {
-      face.calcVisible()
-    })
+    this.faces.forEach((face) => face.calcVisible())
   }
 
   /**
