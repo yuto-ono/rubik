@@ -9,7 +9,7 @@
     outline: none;
     padding: 5px 20px;
     border-radius: 4px;
-    background-color: #69c;
+    background-color: #369;
     color: #fff;
     font-size: 16px;
     font-weight: bold;
