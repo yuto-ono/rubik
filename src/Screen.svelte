@@ -77,6 +77,7 @@
 </script>
 
 <div class="screen-wrapper">
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <svg
     class="svg"
     viewBox="0 0 700 700"
